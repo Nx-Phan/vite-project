@@ -23,7 +23,7 @@ const data = {
   datasets: [
     {
       label: "Lisa",
-      data: [120, 20, 50, 75, 85],
+      data: [50, 70, 100, 34, 47],
       backgroundColor: "rgba(255,255,255,0.2)",
       borderColor: "#f5ebd0",
       pointStyle: "rect",
