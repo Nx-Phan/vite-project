@@ -1,0 +1,40 @@
+body {
+  background-color: #452e66;
+  color: white;
+  padding: 40px;
+  font-family: Arial;
+  text-align: center;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Left Logo */
+.navbar-logo img {
+  height: 40px;
+  cursor: pointer;
+}
+
+/* Right-side icons */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.icon-button img {
+  height: 32px;
+  width: 32px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.icon-button img:hover {
+  transform: scale(1.1);
+}
