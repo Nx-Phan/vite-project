@@ -1,25 +1,26 @@
-import React from "react";
-import "./ProfilePage.css"; // optional for styling
+import { useState } from "react";
+import ProfileCustomizer from "../components/ProfileCustomizer";
 
-const ProfilePage: React.FC = () => {
-  // Example user data
-  const username = "Nevon Xaya";
-  const email = "nevon@example.com";
+export default function ProfilePage() {
+  const [customizing, setCustomizing] = useState(false);
 
   return (
-    <div className="profile-container">
-      <div className="profile-card">
-        <img
-          src="/default-profile.png" // put a default profile image in /public
-          alt="Profile"
-          className="profile-picture"
-        />
-        <h2>{username}</h2>
-        <p>{email}</p>
-        <button className="edit-button">Edit Profile</button>
-      </div>
+    <div style={{ padding: 20 }}>
+      <h1>My Profile</h1>
+
+      <button
+        onClick={() => setCustomizing(!customizing)}
+        style={{
+          padding: "10px 20px",
+          borderRadius: 8,
+          cursor: "pointer",
+          marginBottom: 20,
+        }}
+      >
+        {customizing ? "Close Customizer" : "Customize Avatar"}
+      </button>
+
+      {customizing && <ProfileCustomizer />}
     </div>
   );
-};
-
-export default ProfilePage;
+}

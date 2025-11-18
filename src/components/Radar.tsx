@@ -69,8 +69,8 @@ export default function BasicRadarChart() {
   return (
     <div
       style={{
-        height: 800,
-        width: 1000,
+        height: "100%",
+        width: "100%",
         border: "2px solid #f5ebd0",
         borderRadius: 20,
         padding: 16,
