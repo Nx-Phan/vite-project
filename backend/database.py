@@ -7,6 +7,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    pass_hash = db.Column(db.String(255), nullable=False)
 
     settings = db.relationship("UserSettings", backref="user", uselist=False)
     videos = db.relationship("Video", backref="user", lazy=True)

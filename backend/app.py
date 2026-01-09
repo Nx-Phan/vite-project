@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from werkzeug.security import generate_password_hash
 from database import db
 from database import User, UserSettings, Video, VideoStats, UserAverages
 
@@ -27,8 +28,44 @@ def test_user():
 def test():
     return {"message": "Flask connected to React"}
 
-@app.route("/api/home/<int:user_id>", methods=["GET"])
-def home(user_id):
+@app.route("/api/createAccount", methods=["POST"])
+def createAccount():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
+
+    if not username or not email or not password:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    if User.query.filter(
+        (User.username == username) | (User.email == email)
+    ).first():
+        return jsonify({"error": "User already exists"}), 409
+    
+    password_hash = generate_password_hash(password)
+
+    new_user = User(
+        username = username,
+        email = email,
+        pass_hash = password_hash
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Account created successfully",
+        "user_id": new_user.id
+    }), 201
+
+
+
+@app.route("/api/stats/<int:user_id>", methods=["GET"])
+def getStats(user_id):
     avg = UserAverages.query.filter_by(user_id=user_id).first()
 
     if not avg:
@@ -41,7 +78,21 @@ def home(user_id):
          "serve": avg.avg_serve, 
          "block": avg.avg_block}
     ])
-        
+
+@app.route("/api/avatar/<int:user_id>", methods=["GET"])
+def getAvatar(user_id):
+    avatar = UserSettings.query.filter_by(user_id=user_id).first()
+
+    if not avatar:
+        return jsonify({"error": "No avatar found"}), 404
+    
+    return jsonify([
+        {"hair": avatar.hair,
+         "eye": avatar.eye,
+         "mouth": avatar.mouth
+        }
+    ])
+ 
 
 if __name__ == "__main__":
     with app.app_context():

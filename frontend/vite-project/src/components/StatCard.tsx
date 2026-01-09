@@ -10,20 +10,31 @@ type Stats = {
   block: number;
 };
 
+type Avatar = {
+  hair: number;
+  eye: number;
+  mouth: number;
+};
+
 function StatCard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [avatar, setAvatar] = useState<Avatar | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/home/1")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch stats");
-        }
+    Promise.all([
+      fetch("http://localhost:5000/api/stats/1").then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch stats");
         return res.json();
-      })
-      .then((data) => {
-        setStats(data);
+      }),
+      fetch("http://localhost:5000/api/avatar/1").then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch avatar");
+        return res.json();
+      }),
+    ])
+      .then(([statsData, avatarData]) => {
+        setStats(statsData);
+        setAvatar(avatarData);
         setLoading(false);
       })
       .catch((err) => {
@@ -36,7 +47,7 @@ function StatCard() {
     return <div className="stat-card">Loading...</div>;
   }
 
-  if (!stats) {
+  if (!stats || !avatar) {
     return <div className="stat-card">No stats available</div>;
   }
 
@@ -47,7 +58,9 @@ function StatCard() {
         <h2 className="player-name">ISAGI</h2>
 
         <div className="avatar-box">
-          <img src="/mock-avatar.png" alt="Avatar" />
+          <img src={`/avatars/hair/${avatar.hair}.png`} />
+          <img src={`/avatars/eyes/${avatar.eye}.png`} />
+          <img src={`/avatars/mouth/${avatar.mouth}.png`} />
         </div>
 
         <div className="rating-box">
