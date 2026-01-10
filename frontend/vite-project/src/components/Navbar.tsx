@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import logo from "../assets/eyeglasses.svg"; // ← your logo
 import uploadIcon from "../assets/arrow-bar-up.svg";
 import profileIcon from "../assets/person-circle.svg";
+import loginIcon from "../assets/login.svg";
 
 const Navbar: React.FC = () => {
   return (
@@ -14,6 +15,10 @@ const Navbar: React.FC = () => {
       <div className="navbar-actions">
         <Link to="/upload" className="icon-button">
           <img src={uploadIcon} alt="Upload Video" />
+        </Link>
+
+        <Link to="/login" className="icon-button">
+          <img src={loginIcon} alt="Login" />
         </Link>
 
         <Link to="/profile" className="icon-button">
