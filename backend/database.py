@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -21,34 +22,74 @@ class UserSettings(db.Model):
     hair = db.Column(db.Integer)
     eye = db.Column(db.Integer)
     mouth = db.Column(db.Integer)
+    face = db.Column(db.Integer)
 
 class Video(db.Model):
-    __tablename__ = "videos"
+    __tablename__ = "video"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
-    filename = db.Column(db.String(255), nullable=False)
-    upload_date = db.Column(db.DateTime, server_default=db.func.now())
-
-    stats = db.relationship("VideoStats", backref="video", uselist=False)
+    title = db.Column(db.String(100))
+    file_path = db.Column(db.String(255), nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=datetime.now())
 
 class VideoStats(db.Model):
     __tablename__ = "video_stats"
+
     id = db.Column(db.Integer, primary_key=True)
     video_id = db.Column(db.Integer, db.ForeignKey("videos.id"), nullable=False)
 
-    attack = db.Column(db.Float, nullable=False)
-    defense = db.Column(db.Float, nullable=False)
-    setting = db.Column(db.Float, nullable=False)
-    serve = db.Column(db.Float, nullable=False)
-    block = db.Column(db.Float, nullable=False)
+    attack_attempts = db.Column(db.Integer, default=0)
+    attack_kills = db.Column(db.Integer, default=0)
+    attack_errors = db.Column(db.Integer, default=0)
+
+    digs = db.Column(db.Integer, default=0)
+    reception_errors = db.Column(db.Integer, default=0)
+
+    set_attempts = db.Column(db.Integer, default=0)
+    assists = db.Column(db.Integer, default=0)
+    bad_sets = db.Column(db.Integer, default=0)
+
+    serve_attempts = db.Column(db.Integer, default=0)
+    aces = db.Column(db.Integer, default=0)
+    serve_errors = db.Column(db.Integer, default=0)
+
+    block_attempts = db.Column(db.Integer, default=0)
+    solo_blocks = db.Column(db.Integer, default=0)
+    block_errors = db.Column(db.Integer, default=0)
+
 
 class UserAverages(db.Model):
     __tablename__ = "user_averages"
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
 
-    avg_attack = db.Column(db.Float, nullable=False)
-    avg_defense = db.Column(db.Float, nullable=False)
-    avg_setting = db.Column(db.Float, nullable=False)
-    avg_serve = db.Column(db.Float, nullable=False)
-    avg_block = db.Column(db.Float, nullable=False)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        primary_key=True
+    )
+
+    attack_efficiency = db.Column(db.Float)
+    attack_volume_score = db.Column(db.Float)
+    attack_final_score = db.Column(db.Float)
+
+    defense_efficiency = db.Column(db.Float)
+    defense_volume_score = db.Column(db.Float)
+    defense_final_score = db.Column(db.Float)
+
+    setting_efficiency = db.Column(db.Float)
+    setting_volume_score = db.Column(db.Float)
+    setting_final_score = db.Column(db.Float)
+
+    serve_efficiency = db.Column(db.Float)
+    serve_volume_score = db.Column(db.Float)
+    serve_final_score = db.Column(db.Float)
+
+    block_efficiency = db.Column(db.Float)
+    block_volume_score = db.Column(db.Float)
+    block_final_score = db.Column(db.Float)
+
+    last_updated = db.Column(
+        db.DateTime,
+        server_default=db.func.now(),
+        onupdate=db.func.now()
+    )
+

@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
-from werkzeug.security import generate_password_hash
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import os
 from database import db
 from database import User, UserSettings, Video, VideoStats, UserAverages
-
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
@@ -17,16 +19,11 @@ db.init_app(app)
 def hello_world():
     return "Hello World"
 
-@app.route("/test-user")
-def test_user():
-    user = User(username="testuser", email="test@test.com")
-    db.session.add(user)
-    db.session.commit()
-    return "User added"
-
-@app.route("/api/test")
-def test():
-    return {"message": "Flask connected to React"}
+@app.route("/api/home", methods=["GET"])
+@jwt_required()
+def home():
+    user_id = get_jwt_identity()
+    return jsonify({"user_id": user_id})
 
 @app.route("/api/createAccount", methods=["POST"])
 def createAccount():
@@ -62,7 +59,62 @@ def createAccount():
         "user_id": new_user.id
     }), 201
 
+@app.route("/api/Login", methods=["POST"])
+def Login():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    username = data.get("username")
+    password = data.get("password")
 
+    if not username or not password:
+        return jsonify({"error": "Missing username or password"}), 400
+    
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"error": "Invalid username or password"}), 401
+    
+    if not check_password_hash(user.password, password):
+        return jsonify({"error": "Invalid username or password"}), 401
+
+    token = create_access_token(identity=user.id)
+
+    return jsonify({
+        "access_token": token,
+        "user_id": user.id
+    }), 200
+
+@app.route("/api/videos/upload", methods=["POST"])
+def upload_video():
+    if "video" not in request.files:
+        return jsonify({"error": "No video provided"}), 400
+
+    video = request.files["video"]
+    user_id = request.form.get("user_id")
+    title = request.form.get("title", "")
+
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    filename = secure_filename(video.filename)
+    save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    video.save(save_path)
+
+    new_video = Video(
+        user_id=user_id,
+        title=title,
+        file_path=save_path
+    )
+
+    db.session.add(new_video)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Video uploaded",
+        "video_id": new_video.id
+    }), 201
 
 @app.route("/api/stats/<int:user_id>", methods=["GET"])
 def getStats(user_id):
@@ -72,11 +124,11 @@ def getStats(user_id):
         return jsonify({"error": "No averages found"}), 404
 
     return jsonify([
-        {"attack": avg.avg_attack, 
-         "defense": avg.avg_defense, 
-         "setting": avg.avg_setting, 
-         "serve": avg.avg_serve, 
-         "block": avg.avg_block}
+        {"attack": avg.attack_efficiency, 
+         "defense": avg.defense_efficiency, 
+         "setting": avg.setting_efficiency, 
+         "serve": avg.serve_efficiency, 
+         "block": avg.block_efficiency}
     ])
 
 @app.route("/api/avatar/<int:user_id>", methods=["GET"])
@@ -87,13 +139,13 @@ def getAvatar(user_id):
         return jsonify({"error": "No avatar found"}), 404
     
     return jsonify([
-        {"hair": avatar.hair,
+        {"face": avatar.face,
+         "hair": avatar.hair,
          "eye": avatar.eye,
          "mouth": avatar.mouth
         }
     ])
  
-
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/eyeglasses.svg"; // ← your logo
+import logo from "../assets/eyeglasses.svg";
 import uploadIcon from "../assets/arrow-bar-up.svg";
 import profileIcon from "../assets/person-circle.svg";
 import loginIcon from "../assets/login.svg";

@@ -1,3 +1,10 @@
+export const faceOptions = [
+  "/avatar/face1.svg",
+  "/avatar/face2.svg",
+  "/avatar/face3.svg",
+];
+
+
 export const hairOptions = [
   "/avatar/hair1.svg",
   "/avatar/hair2.svg",

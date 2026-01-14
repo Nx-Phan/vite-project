@@ -1,7 +1,13 @@
 import { useState } from "react";
-import { hairOptions, eyesOptions, mouthOptions } from "../data/avatarParts";
+import {
+  hairOptions,
+  eyesOptions,
+  mouthOptions,
+  faceOptions,
+} from "../data/avatarParts";
 
 export default function ProfileCustomizer() {
+  const [face, setFace] = useState(0);
   const [hair, setHair] = useState(0);
   const [eyes, setEyes] = useState(0);
   const [mouth, setMouth] = useState(0);
@@ -40,12 +46,20 @@ export default function ProfileCustomizer() {
           margin: "0 auto 30px",
         }}
       >
+        <img src={faceOptions[face]} style={layerStyle} />
         <img src={hairOptions[hair]} style={layerStyle} />
         <img src={eyesOptions[eyes]} style={layerStyle} />
         <img src={mouthOptions[mouth]} style={layerStyle} />
       </div>
 
       {/* Selectors — compact row layout */}
+      <SelectorRow
+        label="Face"
+        img={faceOptions[face]}
+        onLeft={() => cycle(face, setFace, faceOptions, -1)}
+        onRight={() => cycle(face, setFace, faceOptions, +1)}
+      />
+
       <SelectorRow
         label="Hair"
         img={hairOptions[hair]}
